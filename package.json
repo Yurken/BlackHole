@@ -33,6 +33,7 @@
   "build": {
     "appId": "com.blackhole.app",
     "productName": "BlackHole",
+    "publish": null,
     "mac": {
       "category": "public.app-category.utilities",
       "target": ["dmg"],

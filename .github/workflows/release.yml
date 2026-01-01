@@ -47,10 +47,13 @@ jobs:
         if: matrix.os == 'macos-latest'
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false  # 禁用代码签名
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 添加 GitHub Token
         run: npm run build:mac
       
       - name: Build Electron app (Windows)
         if: matrix.os == 'windows-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 添加 GitHub Token
         run: npm run build:win
       
       - name: Upload artifacts (macOS)
