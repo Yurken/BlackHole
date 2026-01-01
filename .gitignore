@@ -1,3 +1,16 @@
+# Node
+node_modules
+dist
+release
+*.log
+.DS_Store
+.vscode
+.idea
+
+# Backend binaries
+backend/main
+backend/blackhole-backend
+
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
