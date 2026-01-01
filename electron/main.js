@@ -172,6 +172,30 @@ ipcMain.on('set-ignore-mouse-events', (event, ignore) => {
   }
 })
 
+// 应用常规设置
+ipcMain.on('apply-settings', (event, settings) => {
+  console.log('Applying settings:', settings)
+  
+  // 应用桌面显示模式
+  if (settings.desktopOnly !== undefined && settings.desktopOnly !== isOnlyOnDesktop) {
+    isOnlyOnDesktop = settings.desktopOnly
+    if (mainWindow) {
+      if (isOnlyOnDesktop) {
+        mainWindow.setVisibleOnAllWorkspaces(false)
+        mainWindow.setAlwaysOnTop(false, 'normal')
+      } else {
+        mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+        mainWindow.setAlwaysOnTop(true, 'floating', 1)
+      }
+    }
+  }
+  
+  // 通知主窗口设置已更新
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('settings-updated', settings)
+  }
+})
+
 // 处理拖放的文件
 ipcMain.handle('process-dropped-file', async (event, filePath) => {
   console.log('Processing dropped file:', filePath)

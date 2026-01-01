@@ -1,6 +1,7 @@
 <template>
   <div
     class="floating-ball"
+    :style="{ '--idle-opacity': opacityValue }"
     @contextmenu.prevent="showContextMenu"
     @dragover.prevent="onDragOver"
     @dragleave.prevent="onDragLeave"
@@ -45,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 const isDragging = ref(false)
 const isHovered = ref(false)
@@ -57,11 +58,41 @@ const processingMessage = ref('')
 const currentFileIndex = ref(0)
 const totalFiles = ref(0)
 const ballRef = ref(null)
+const idleOpacity = ref(40) // 默认透明度 40%
+const muteSound = ref(false) // 静音模式
+const autoFade = ref(true) // 自动变淡
 let lastScreenX = 0
 let lastScreenY = 0
 
+// 计算透明度（0-100 转换为 0-1，最小10%）
+const opacityValue = computed(() => Math.max(idleOpacity.value, 10) / 100)
+
+// 加载设置
+const loadSettings = () => {
+  try {
+    const settings = localStorage.getItem('blackhole_general_settings')
+    if (settings) {
+      const parsed = JSON.parse(settings)
+      if (parsed.idleOpacity !== undefined) {
+        idleOpacity.value = Math.max(parsed.idleOpacity, 10)
+      }
+      if (parsed.muteSound !== undefined) {
+        muteSound.value = parsed.muteSound
+      }
+      if (parsed.autoFade !== undefined) {
+        autoFade.value = parsed.autoFade
+      }
+    }
+  } catch (e) {
+    console.error('加载设置失败:', e)
+  }
+}
+
 // 播放成功提示音
 const playSuccessSound = () => {
+  // 静音模式下不播放
+  if (muteSound.value) return
+  
   try {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)()
     const oscillator = audioContext.createOscillator()
@@ -274,6 +305,9 @@ const processFiles = async (files) => {
 }
 
 onMounted(() => {
+  // 加载设置
+  loadSettings()
+  
   // 监听全局拖放事件用于调试
   const handleGlobalDragEnter = (e) => {
     if (e.dataTransfer?.types?.includes('Files')) {
@@ -293,6 +327,13 @@ onMounted(() => {
   })
 
   window.electronAPI?.onDesktopModeChanged(() => {})
+  
+  // 监听设置变化
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'blackhole_general_settings') {
+      loadSettings()
+    }
+  })
 })
 </script>
 
@@ -324,7 +365,7 @@ onMounted(() => {
   cursor: default;
   position: relative;
   -webkit-app-region: no-drag;
-  opacity: 0.42;
+  opacity: var(--idle-opacity, 0.42);
   pointer-events: auto;
   overflow: hidden;
   animation: orb-breathe 2.5s ease-in-out infinite;

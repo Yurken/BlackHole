@@ -310,7 +310,7 @@
                 <input 
                   v-model="generalSettings.idleOpacity" 
                   type="range" 
-                  min="0" 
+                  min="10" 
                   max="100" 
                   class="opacity-slider"
                 />
@@ -838,6 +838,14 @@ const generalSettings = ref({
   language: 'system',
   followMouse: true
 })
+
+// 应用常规设置到主窗口
+const applyGeneralSettings = () => {
+  // 通知 Electron 主进程应用设置
+  if (window.electronAPI?.applySettings) {
+    window.electronAPI.applySettings(generalSettings.value)
+  }
+}
 
 const tabs = [
   { id: 'rule', label: '规则' },
@@ -1749,6 +1757,16 @@ async function loadOllamaModels() {
   }
 }
 
+// 监听常规设置变化并保存
+watch(generalSettings, (newSettings) => {
+  try {
+    localStorage.setItem('blackhole_general_settings', JSON.stringify(newSettings))
+    applyGeneralSettings()
+  } catch (e) {
+    console.error('保存设置失败:', e)
+  }
+}, { deep: true })
+
 // 监听标签页切换
 watch(currentTab, (newTab) => {
   if (newTab === 'history') {
@@ -1811,6 +1829,17 @@ async function loadAIConfig() {
 
 // 组件挂载时加载数据
 onMounted(() => {
+  // 加载常规设置
+  try {
+    const saved = localStorage.getItem('blackhole_general_settings')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      Object.assign(generalSettings.value, parsed)
+    }
+  } catch (e) {
+    console.error('加载常规设置失败:', e)
+  }
+  
   loadUserTemplates()
   loadRules()
   loadAIConfig()

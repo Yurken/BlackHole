@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onOpenSettings: (callback) => ipcRenderer.on('open-settings', callback),
   onDesktopModeChanged: (callback) => ipcRenderer.on('desktop-mode-changed', (event, value) => callback(value)),
   setIgnoreMouseEvents: (ignore) => ipcRenderer.send('set-ignore-mouse-events', ignore),
+  // 应用常规设置
+  applySettings: (settings) => ipcRenderer.send('apply-settings', settings),
   // 打开文件夹选择对话框
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   // 打开文件选择对话框
