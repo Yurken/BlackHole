@@ -200,14 +200,3 @@ BlackHole/
 [AI] 原始响应: {"suggested_name": "研究论文", ...}
 [AI] 解析结果: suggested_name=研究论文, category=文档
 ```
-
-## 📝 许可证
-
-MIT License
-
-## 🙏 致谢
-
-- [Ollama](https://ollama.ai/) - 本地 AI 模型运行
-- [Qwen](https://github.com/QwenLM/Qwen) - 视觉语言模型
-- [Electron](https://www.electronjs.org/) - 跨平台桌面应用框架
-- [Vue.js](https://vuejs.org/) - 渐进式前端框架
