@@ -25,6 +25,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
+      - name: Set package.json version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "GITHUB_REF=$GITHUB_REF"
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Setting package.json version to $VERSION"
+          npm version "$VERSION" --no-git-tag-version
       
       - name: Setup Go
         uses: actions/setup-go@v4
